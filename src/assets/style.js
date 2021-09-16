@@ -81,6 +81,9 @@ const styles = {
   primaryBackground: {
     backgroundColor: variables.primaryColor,
   },
+  lightPrimaryBackground: {
+    backgroundColor: variables.lightPrimary,
+  },
   secondaryBackground: {
     backgroundColor: variables.secondaryColor,
   },

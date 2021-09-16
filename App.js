@@ -27,6 +27,8 @@ import CustomTextInput from './src/components/CustomTextInput';
 import Home from './src/views/home';
 import UpdateProfile from './src/views/UpdateProfile';
 import {Provider as AppProvider} from 'react-redux';
+import BonusHistory from './src/views/BonusHistory';
+import WithdrawHistory from './src/views/WithdrawHistory';
 
 const App = () => {
   // useEffect(() => {
@@ -56,7 +58,7 @@ const App = () => {
           <IconRegistry icons={EvaIconsPack} />
           <ApplicationProvider mapping={mapping} theme={lightTheme}>
             <NavigationContainer ref={navigationRef}>
-              <Routes />
+              <BonusHistory />
             </NavigationContainer>
             <Toast ref={(ref) => Toast.setRef(ref)} />
           </ApplicationProvider>

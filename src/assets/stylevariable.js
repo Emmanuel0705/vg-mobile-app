@@ -9,6 +9,7 @@ const variables = {
   lightgrey: '#f4f5f7',
   darkgrey: '#919191',
   black: '#000',
+  lightPrimary: '#FFFBEB',
 };
 
 export default variables;

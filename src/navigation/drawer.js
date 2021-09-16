@@ -74,11 +74,24 @@ const DrawerNav = () => {
         }}
       />
       <Drawer.Screen
-        name="Settings"
+        name="Bonus History"
         component={Home}
         options={{
           drawerIcon: ({focused, size}) => (
-            <Icon name="cog" size={size} color={focused ? '#7cc' : '#ccc'} />
+            <Icon name="cash" size={size} color={focused ? '#7cc' : '#ccc'} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Withdraw History"
+        component={Home}
+        options={{
+          drawerIcon: ({focused, size}) => (
+            <Icon
+              name="history"
+              size={size}
+              color={focused ? '#7cc' : '#ccc'}
+            />
           ),
         }}
       />
