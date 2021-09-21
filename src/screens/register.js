@@ -57,7 +57,6 @@ const Register = (props) => {
     };
     const res = await registerUser(payload);
     setShowLoader(false);
-    console.log(res.user);
     if (!res.success) {
       Toast.show({
         type: 'error',

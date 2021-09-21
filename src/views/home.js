@@ -10,19 +10,20 @@ import {useDispatch, useSelector} from 'react-redux';
 import {approveTransaction, getTransactions} from '../services/transaction';
 import {storeUser} from '../redux/actions/user.action';
 import {authUser} from '../services/user';
+import {PAYSTACK_PK} from '../config/constants';
 
 const axios = require('axios');
 
 const Home = (props) => {
   const user = useSelector((store) => store.user).data;
   const dispatch = useDispatch();
+
   // const [user, setUser] = useState({});
   const [showPaystack, setShowPaystack] = useState(false);
   const [paid, setPaid] = useState(false);
   const [reload, setReload] = useState();
 
   useEffect(() => {
-    console.log({trxx: user.transactions});
     getUser();
     getTrx();
   }, [reload]);
@@ -164,9 +165,9 @@ const Home = (props) => {
       {showPaystack && (
         <View style={{flex: 1}}>
           <Paystack
-            paystackKey="pk_test_88866eb856c55f2e82c99400b220abbad1c077f3"
+            paystackKey={PAYSTACK_PK}
             amount={'50000.00'}
-            billingEmail="paystackwebview@something.com"
+            billingEmail={user.email}
             activityIndicatorColor="green"
             onCancel={(e) => {
               // handle response here

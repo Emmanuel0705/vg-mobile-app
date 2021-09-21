@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import * as firebase from "firebase";
+import React, {useState} from 'react';
+import * as firebase from 'firebase';
 
-import { TouchableOpacity, View, LogBox, Image, Alert } from "react-native";
+import {TouchableOpacity, View, LogBox, Image, Alert} from 'react-native';
 import {
   Select,
   Card,
@@ -9,22 +9,24 @@ import {
   SelectItem,
   Input,
   Button,
-} from "@ui-kitten/components";
-import Toast from "react-native-toast-message";
+} from '@ui-kitten/components';
+import Toast from 'react-native-toast-message';
 
-import * as ImagePicker from "expo-image-picker";
+import * as ImagePicker from 'expo-image-picker';
 
-import style from "../assets/style";
-import { Icon, Thumbnail } from "native-base";
+import style from '../assets/style';
+import {Icon, Thumbnail} from 'native-base';
+import {uploadKyc} from '../services/user';
+import {useDispatch, useSelector} from 'react-redux';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAb_74Slm90KkDIdhGZR3bVrwGm30T3W0c",
-  authDomain: "vglobal-dbx.firebaseapp.com",
-  projectId: "vglobal-dbx",
-  storageBucket: "vglobal-dbx.appspot.com",
-  messagingSenderId: "397365610818",
-  appId: "1:397365610818:web:cf51910e241fa6877860db",
-  measurementId: "G-VEEZYR902B",
+  apiKey: 'AIzaSyAb_74Slm90KkDIdhGZR3bVrwGm30T3W0c',
+  authDomain: 'vglobal-dbx.firebaseapp.com',
+  projectId: 'vglobal-dbx',
+  storageBucket: 'vglobal-dbx.appspot.com',
+  messagingSenderId: '397365610818',
+  appId: '1:397365610818:web:cf51910e241fa6877860db',
+  measurementId: 'G-VEEZYR902B',
 };
 
 if (!firebase.apps.length) {
@@ -33,15 +35,17 @@ if (!firebase.apps.length) {
 LogBox.ignoreLogs([`Setting a timer for a long period`]);
 
 const KYCInfo = () => {
-  const data = ["Nation ID", "Driver License", "International Passport"];
+  const user = useSelector((store) => store.user).data;
+  const dispatch = useDispatch();
+  const data = ['Nation ID', 'Driver License', 'International Passport'];
   const [uploading, setUploading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const [formData, setFormData] = useState({
-    front: "",
-    back: "",
-    type: "",
-    number: "",
+    front: '',
+    back: '',
+    type: '',
+    number: '',
   });
 
   const renderOption = (title) => <SelectItem key={`${title}`} title={title} />;
@@ -51,7 +55,7 @@ const KYCInfo = () => {
       await ImagePicker.requestMediaLibraryPermissionsAsync();
 
     if (permissionResult.granted === false) {
-      Alert.alert("Permission to access camera roll is required!");
+      Alert.alert('Permission to access camera roll is required!');
       return;
     }
 
@@ -61,11 +65,11 @@ const KYCInfo = () => {
     // this._handleImagePicked(pickerResult);
   };
   const handleSetImg = (type, uri) => {
-    if (type === "front") {
-      setFormData({ ...formData, front: uri });
+    if (type === 'front') {
+      setFormData({...formData, front: uri});
       return;
     }
-    setFormData({ ...formData, back: uri });
+    setFormData({...formData, back: uri});
   };
   const _handleImagePicked = async (uri) => {
     try {
@@ -74,8 +78,8 @@ const KYCInfo = () => {
       const uploadUrl = await uploadImageAsync(uri);
       setImage(uploadUrl);
     } catch (e) {
-      console.log({ ERROR: e.message });
-      alert("Upload failed, sorry ");
+      console.log({ERROR: e.message});
+      alert('Upload failed, sorry ');
     } finally {
       setUploading(false);
     }
@@ -91,10 +95,10 @@ const KYCInfo = () => {
       };
       xhr.onerror = function (e) {
         console.log(e);
-        reject(new TypeError("Network request failed"));
+        reject(new TypeError('Network request failed'));
       };
-      xhr.responseType = "blob";
-      xhr.open("GET", uri, true);
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
       xhr.send(null);
     });
 
@@ -110,37 +114,37 @@ const KYCInfo = () => {
     return res;
   }
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!formData.type) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Provide a means of Identification",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Provide a means of Identification',
         visibilityTime: 4000,
       });
     } else if (!formData.number) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Provide the selected ID number",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Provide the selected ID number',
         visibilityTime: 4000,
       });
     } else if (!formData.front) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Upload ID image front",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Upload ID image front',
         visibilityTime: 4000,
       });
     } else if (!formData.back) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Upload ID image Back",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Upload ID image Back',
         visibilityTime: 4000,
       });
     }
@@ -148,14 +152,15 @@ const KYCInfo = () => {
       const payload = {
         ...formData,
       };
-      console.log(payload);
+      // console.log(user.token);
+      const res = await uploadKyc(user.token, payload);
     }
   };
 
   return (
     <Card style={[style.fullHeight, style.noBorder, style.progressComponent]}>
-      <View style={{ flex: 1 }}>
-        <View style={{ marginTop: 10 }}>
+      <View style={{flex: 1}}>
+        <View style={{marginTop: 10}}>
           <Text category="p1" style={[style.openSansRegular, style.colorLight]}>
             Means Of Identification
           </Text>
@@ -165,21 +170,19 @@ const KYCInfo = () => {
             defaultValue={formData.type}
             onSelect={(index) => {
               setSelectedIndex(index.row);
-              setFormData({ ...formData, type: data[index.row] });
-            }}
-          >
+              setFormData({...formData, type: data[index.row]});
+            }}>
             {data.map(renderOption)}
           </Select>
         </View>
         <View>
           <Input
-            textStyle={{ height: 30 }}
+            textStyle={{height: 30}}
             label={(evaProps) => (
               <Text
                 category="p1"
                 {...evaProps}
-                style={[style.openSansRegular, style.label, style.colorLight]}
-              >
+                style={[style.openSansRegular, style.label, style.colorLight]}>
                 Upload ID Card/Passport Number
               </Text>
             )}
@@ -187,34 +190,32 @@ const KYCInfo = () => {
             defaultValue={formData.number}
             placeholder="ID Number"
             keyboardType="visible-password"
-            onChangeText={(text) => setFormData({ ...formData, number: text })}
+            onChangeText={(text) => setFormData({...formData, number: text})}
           />
         </View>
-        <View style={{ height: 200 }}>
+        <View style={{height: 200}}>
           <TouchableOpacity
             style={{
               marginVertical: 30,
-              fontFamily: "ProductSans-Regular",
-              backgroundColor: "#EEF5FD",
+              fontFamily: 'ProductSans-Regular',
+              backgroundColor: '#EEF5FD',
               height: 40,
-              shadowColor: "#eee",
-              shadowOffset: { width: 0, height: 1 },
+              shadowColor: '#eee',
+              shadowOffset: {width: 0, height: 1},
               shadowOpacity: 0.5,
               shadowRadius: 2,
               elevation: 3,
-              alignItems: "center",
-              justifyContent: "center",
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onPress={() => {
-              _pickImage("front");
-            }}
-          >
+              _pickImage('front');
+            }}>
             <Text
               style={[
-                { top: -25, left: 0, color: "#3B5472", position: "absolute" },
+                {top: -25, left: 0, color: '#3B5472', position: 'absolute'},
                 style.openSansRegular,
-              ]}
-            >
+              ]}>
               Upload ID Image (Front)
             </Text>
             <Text>
@@ -224,27 +225,25 @@ const KYCInfo = () => {
           <TouchableOpacity
             style={{
               marginVertical: 10,
-              fontFamily: "ProductSans-Regular",
-              backgroundColor: "#EEF5FD",
+              fontFamily: 'ProductSans-Regular',
+              backgroundColor: '#EEF5FD',
               height: 40,
-              shadowColor: "#eee",
-              shadowOffset: { width: 0, height: 1 },
+              shadowColor: '#eee',
+              shadowOffset: {width: 0, height: 1},
               shadowOpacity: 0.5,
               shadowRadius: 2,
               elevation: 3,
-              alignItems: "center",
-              justifyContent: "center",
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
             onPress={() => {
-              _pickImage("back");
-            }}
-          >
+              _pickImage('back');
+            }}>
             <Text
               style={[
-                { top: -25, left: 0, color: "#3B5472", position: "absolute" },
+                {top: -25, left: 0, color: '#3B5472', position: 'absolute'},
                 style.openSansRegular,
-              ]}
-            >
+              ]}>
               Upload ID Image (back)
             </Text>
             <Text>
@@ -256,26 +255,24 @@ const KYCInfo = () => {
       {formData.front || formData.back ? (
         <View
           style={{
-            width: "100%",
+            width: '100%',
             height: 80,
             flex: 1,
-            flexDirection: "row",
-            justifyContent: "space-between",
+            flexDirection: 'row',
+            justifyContent: 'space-between',
             marginTop: -20,
             marginVertical: 20,
-          }}
-        >
+          }}>
           {formData.front ? (
             <View
               style={{
-                justifyContent: "center",
-                alignItems: "center",
-                width: "50%",
-              }}
-            >
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '50%',
+              }}>
               <Text>Front</Text>
               <Image
-                style={{ width: "95%", height: "100%" }}
+                style={{width: '95%', height: '100%'}}
                 source={{
                   uri: `${formData.front}`,
                 }}
@@ -287,14 +284,13 @@ const KYCInfo = () => {
           {formData.back ? (
             <View
               style={{
-                justifyContent: "center",
-                alignItems: "center",
-                width: "50%",
-              }}
-            >
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '50%',
+              }}>
               <Text>Back</Text>
               <Image
-                style={{ width: "95%", height: "100%" }}
+                style={{width: '95%', height: '100%'}}
                 source={{
                   uri: `${formData.back}`,
                 }}
@@ -315,8 +311,7 @@ const KYCInfo = () => {
           style.openSansRegular,
           style.noBorder,
         ]}
-        onPress={() => onSubmit()}
-      >
+        onPress={() => onSubmit()}>
         Submit
       </Button>
     </Card>

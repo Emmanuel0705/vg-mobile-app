@@ -48,7 +48,6 @@ const Login = (props) => {
     };
     const res = await loginUser(payload);
     setShowLoader(false);
-    console.log(res.user);
     if (!res.success) {
       Toast.show({
         type: 'error',

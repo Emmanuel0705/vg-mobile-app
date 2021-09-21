@@ -17,7 +17,6 @@ const Stack = createStackNavigator();
 
 const StackNav = () => {
   const user = useSelector((store) => store.user).data;
-  console.log({___________user: user._id});
   return (
     <>
       {user._id ? (

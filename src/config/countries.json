@@ -146,7 +146,7 @@
     },
     {
       "country": "Antarctica",
-      "states": []
+      "states": ["Antarctica"]
     },
     {
       "country": "Antigua and Barbuda",
@@ -208,7 +208,7 @@
     },
     {
       "country": "Australia",
-      "states": []
+      "states": ["Australia"]
     },
     {
       "country": "Austria",

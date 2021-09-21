@@ -2,7 +2,6 @@ import axios from 'axios';
 import {API_BASE_URL} from '../config/constants';
 
 export const getRefs = async (token) => {
-  console.log(token);
   try {
     const login = await axios.get(`${API_BASE_URL}/user/refs`, {
       headers: {authorization: `Bearer ${token}`},

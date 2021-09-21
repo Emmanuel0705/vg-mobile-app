@@ -24,10 +24,8 @@ const Referrals = (props) => {
   }, []);
   const getR = async () => {
     setLoading(true);
-    console.log(user);
     const refs = await getRefs(user.token);
     setLoading(false);
-    console.log(refs.res);
     if (refs.success) {
       setReferrals(refs.res);
     }

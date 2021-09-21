@@ -13,10 +13,8 @@ let openImagePickerAsync = async () => {
   let pickerResult = await ImagePicker.launchImageLibraryAsync();
 
   if (pickerResult.type === 'image') {
-    console.log(pickerResult);
     const extension = pickerResult.uri.split('.').pop();
     if (extension === 'png' || extension === 'jpg') {
-      console.log(pickerResult.uri);
       //   setExt(extension);
       //   setImage(pickerResult.uri);
       return;

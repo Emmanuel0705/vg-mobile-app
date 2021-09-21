@@ -58,7 +58,7 @@ const App = () => {
           <IconRegistry icons={EvaIconsPack} />
           <ApplicationProvider mapping={mapping} theme={lightTheme}>
             <NavigationContainer ref={navigationRef}>
-              <BonusHistory />
+              <Routes />
             </NavigationContainer>
             <Toast ref={(ref) => Toast.setRef(ref)} />
           </ApplicationProvider>

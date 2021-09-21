@@ -18,6 +18,8 @@ import UpdateProfile from '../views/UpdateProfile';
 import ProfileEdit from '../views/profile_edit';
 import Payment from '../views/payment';
 import ResetPassword from '../views/password';
+import WithdrawHistory from '../views/WithdrawHistory';
+import BonusHistory from '../views/BonusHistory';
 
 const Drawer = createDrawerNavigator();
 const DrawerNav = () => {
@@ -75,7 +77,7 @@ const DrawerNav = () => {
       />
       <Drawer.Screen
         name="Bonus History"
-        component={Home}
+        component={BonusHistory}
         options={{
           drawerIcon: ({focused, size}) => (
             <Icon name="cash" size={size} color={focused ? '#7cc' : '#ccc'} />
@@ -84,7 +86,7 @@ const DrawerNav = () => {
       />
       <Drawer.Screen
         name="Withdraw History"
-        component={Home}
+        component={WithdrawHistory}
         options={{
           drawerIcon: ({focused, size}) => (
             <Icon

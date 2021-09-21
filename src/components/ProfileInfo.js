@@ -1,5 +1,5 @@
-import React, { Component, useState } from "react";
-import { View } from "react-native";
+import React, {useState, useEffect} from 'react';
+import {View} from 'react-native';
 import {
   Card,
   Text,
@@ -7,114 +7,123 @@ import {
   Select,
   Input,
   Button,
-} from "@ui-kitten/components";
-import Toast from "react-native-toast-message";
+} from '@ui-kitten/components';
+import Toast from 'react-native-toast-message';
+import {Loader} from './loader';
 
-import style from "../assets/style";
-import countries from "../config/countries.json";
+import style from '../assets/style';
+import countries from '../config/countries.json';
+import {authUser, uploadProfile} from '../services/user';
+import {useDispatch, useSelector} from 'react-redux';
 
 const ProfileInfo = (props) => {
-  const [genders, setGenders] = useState(["Male", "female"]);
+  const user = useSelector((store) => store.user).data;
+  const dispatch = useDispatch();
+
+  const [genders, setGenders] = useState(['Male', 'female']);
   const [countryIndex, setCountryIndex] = useState(0);
   const [stateIndex, setStateIndex] = useState(0);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    phone: "",
-    gender: "",
-    country: "",
-    city: "",
-    whatsapp: "",
-    address: "",
-    state: "",
-    firstName: "",
-    lastName: "",
-    middleName: "",
-    email: "",
+    phone: '',
+    gender: '',
+    country: '',
+    city: '',
+    whatsapp: '',
+    address: '',
+    state: '',
+    firstName: '',
+    lastName: '',
+    middleName: '',
+    email: '',
   });
 
   const renderOption = (title, i) => (
     <SelectItem key={`i${title}`} title={title} />
   );
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (!formData.email) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Provide email address",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Provide email address',
         visibilityTime: 4000,
       });
-    } else if (!formData.middleName) {
+    }
+    if (!formData.middleName) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Provide middle name",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Provide middle name',
         visibilityTime: 4000,
       });
     } else if (!formData.gender) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Gender required",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Gender required',
         visibilityTime: 4000,
       });
     } else if (!formData.firstName) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Enter first name",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Enter first name',
         visibilityTime: 4000,
       });
     } else if (!formData.lastName) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Enter last name",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Enter last name',
         visibilityTime: 4000,
       });
     } else if (!formData.phone) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Enter phone number",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Enter phone number',
         visibilityTime: 4000,
       });
     } else if (!formData.whatsapp) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Enter whatsApp number",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Enter whatsApp number',
         visibilityTime: 4000,
       });
     } else if (!formData.city) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Enter your city",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Enter your city',
         visibilityTime: 4000,
       });
     } else if (!formData.state) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "please select state",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'please select state',
         visibilityTime: 4000,
       });
     } else if (!formData.country) {
       Toast.show({
-        type: "error",
-        position: "top",
-        text1: "",
-        text2: "Select Country",
+        type: 'error',
+        position: 'top',
+        text1: '',
+        text2: 'Select Country',
         visibilityTime: 4000,
       });
     }
@@ -122,11 +131,11 @@ const ProfileInfo = (props) => {
       formData.firstName &&
       formData.lastName &&
       formData.middleName &&
-      formData.email &&
       formData.gender &&
       formData.country &&
       formData.state &&
       formData.city &&
+      formData.email &&
       formData.address &&
       formData.phone &&
       formData.whatsapp
@@ -135,75 +144,102 @@ const ProfileInfo = (props) => {
         ...formData,
         name: `${formData.firstName} ${formData.lastName} ${formData.middleName}`,
       };
-      console.log(payload);
+
+      setLoading(true);
+      const res = await uploadProfile(user.token, payload);
+      setLoading(false);
+      if (res.success) {
+        dispatch({...user, ...res.user});
+      } else {
+        console.log(res);
+      }
     }
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
+  const getUser = async () => {
+    setLoading(true);
+    const res = await authUser(user.token);
+    setLoading(false);
+    if (res.success) {
+      const {name} = res.user;
+      const Name = name.split(' ');
+      setFormData({
+        ...formData,
+        ...res.user,
+        firstName: Name[0] || '',
+        lastName: Name[1] || '',
+        middleName: Name[2] || '',
+      });
+    }
+    // else setReload(!reload);
   };
 
   return (
     <Card style={[style.fullHeight, style.noBorder, style.progressComponent]}>
+      <Loader visible={loading} />
+
       <View>
         <Input
-          textStyle={{ height: 30 }}
+          textStyle={{height: 30}}
           label={(evaProps) => (
             <Text
               category="p1"
               {...evaProps}
-              style={[style.openSansRegular, style.label, style.colorLight]}
-            >
+              style={[style.openSansRegular, style.label, style.colorLight]}>
               First Name
             </Text>
           )}
           style={[style.input, style.boxWithShadow]}
           defaultValue={formData.firstName}
           placeholder="First Name"
-          onChangeText={(e) => setFormData({ ...formData, firstName: e })}
+          onChangeText={(e) => setFormData({...formData, firstName: e})}
         />
       </View>
       <View>
         <Input
-          textStyle={{ height: 30 }}
+          textStyle={{height: 30}}
           label={(evaProps) => (
             <Text
               category="p1"
               {...evaProps}
-              style={[style.openSansRegular, style.label, style.colorLight]}
-            >
+              style={[style.openSansRegular, style.label, style.colorLight]}>
               Last Name
             </Text>
           )}
           style={[style.input, style.boxWithShadow]}
           defaultValue={formData.lastName}
           placeholder="Surname"
-          onChangeText={(e) => setFormData({ ...formData, lastName: e })}
+          onChangeText={(e) => setFormData({...formData, lastName: e})}
         />
       </View>
       <View>
         <Input
-          textStyle={{ height: 30 }}
+          textStyle={{height: 30}}
           label={(evaProps) => (
             <Text
               category="p1"
               {...evaProps}
-              style={[style.openSansRegular, style.label, style.colorLight]}
-            >
+              style={[style.openSansRegular, style.label, style.colorLight]}>
               Middle Name
             </Text>
           )}
           style={[style.input, style.boxWithShadow]}
           defaultValue={formData.middleName}
           placeholder="Middle Name"
-          onChangeText={(e) => setFormData({ ...formData, middleName: e })}
+          onChangeText={(e) => setFormData({...formData, middleName: e})}
         />
       </View>
       <View>
         <Input
-          textStyle={{ height: 30 }}
+          textStyle={{height: 30}}
           label={(evaProps) => (
             <Text
               category="p1"
               {...evaProps}
-              style={[style.openSansRegular, style.label, style.colorLight]}
-            >
+              style={[style.openSansRegular, style.label, style.colorLight]}>
               Email
             </Text>
           )}
@@ -211,14 +247,13 @@ const ProfileInfo = (props) => {
           defaultValue={formData.email}
           placeholder="123@example.com"
           keyboardType="email-address"
-          onChangeText={(e) => setFormData({ ...formData, email: e })}
+          onChangeText={(e) => setFormData({...formData, email: e})}
         />
       </View>
-      <View style={{ marginTop: 10 }}>
+      <View style={{marginTop: 10}}>
         <Text
           category="p1"
-          style={[style.openSansRegular, style.label2, style.colorLight]}
-        >
+          style={[style.openSansRegular, style.label2, style.colorLight]}>
           Gender
         </Text>
         <Select
@@ -226,22 +261,20 @@ const ProfileInfo = (props) => {
           defaultValue={formData.gender}
           onSelect={(index) => {
             setSelectedIndex(index.row);
-            setFormData({ ...formData, gender: genders[index.row] });
+            setFormData({...formData, gender: genders[index.row]});
           }}
-          value={formData.gender}
-        >
+          value={formData.gender}>
           {genders.map(renderOption)}
         </Select>
       </View>
       <View>
         <Input
-          textStyle={{ height: 30 }}
+          textStyle={{height: 30}}
           label={(evaProps) => (
             <Text
               category="p1"
               {...evaProps}
-              style={[style.openSansRegular, style.label, style.colorLight]}
-            >
+              style={[style.openSansRegular, style.label, style.colorLight]}>
               Phone Number
             </Text>
           )}
@@ -249,18 +282,17 @@ const ProfileInfo = (props) => {
           defaultValue={formData.phone}
           placeholder="+1234567890"
           keyboardType="phone-pad"
-          onChangeText={(e) => setFormData({ ...formData, phone: e })}
+          onChangeText={(e) => setFormData({...formData, phone: e})}
         />
       </View>
       <View>
         <Input
-          textStyle={{ height: 30 }}
+          textStyle={{height: 30}}
           label={(evaProps) => (
             <Text
               category="p1"
               {...evaProps}
-              style={[style.openSansRegular, style.label, style.colorLight]}
-            >
+              style={[style.openSansRegular, style.label, style.colorLight]}>
               WhatsApp Number
             </Text>
           )}
@@ -268,7 +300,7 @@ const ProfileInfo = (props) => {
           defaultValue={formData.whatsapp}
           placeholder="+1234567890"
           keyboardType="number-pad"
-          onChangeText={(e) => setFormData({ ...formData, whatsapp: e })}
+          onChangeText={(e) => setFormData({...formData, whatsapp: e})}
         />
       </View>
 
@@ -284,13 +316,12 @@ const ProfileInfo = (props) => {
             setFormData({
               ...formData,
               country: countries.countries[index.row].country,
-              state: "",
+              state: '',
             });
             setStateIndex(0);
 
             setCountryIndex(index.row);
-          }}
-        >
+          }}>
           {countries.countries.map((e, i) => (
             <SelectItem key={`${e.country}${i}`} title={e.country} />
           ))}
@@ -310,8 +341,7 @@ const ProfileInfo = (props) => {
               ...formData,
               state: countries.countries[countryIndex].states[index.row],
             });
-          }}
-        >
+          }}>
           {(formData.country
             ? countries.countries[countryIndex].states
             : []
@@ -322,38 +352,36 @@ const ProfileInfo = (props) => {
       </View>
       <View>
         <Input
-          textStyle={{ height: 30 }}
+          textStyle={{height: 30}}
           label={(evaProps) => (
             <Text
               category="p1"
               {...evaProps}
-              style={[style.openSansRegular, style.label, style.colorLight]}
-            >
+              style={[style.openSansRegular, style.label, style.colorLight]}>
               City
             </Text>
           )}
           style={[style.input, style.boxWithShadow]}
           defaultValue={formData.city}
           placeholder="City/Town"
-          onChangeText={(e) => setFormData({ ...formData, city: e })}
+          onChangeText={(e) => setFormData({...formData, city: e})}
         />
       </View>
       <View>
         <Input
-          textStyle={{ height: 30 }}
+          textStyle={{height: 30}}
           label={(evaProps) => (
             <Text
               category="p1"
               {...evaProps}
-              style={[style.openSansRegular, style.label, style.colorLight]}
-            >
+              style={[style.openSansRegular, style.label, style.colorLight]}>
               Address
             </Text>
           )}
           style={[style.input, style.boxWithShadow]}
           placeholder="Landmark"
           defaultValue={formData.address}
-          onChangeText={(e) => setFormData({ ...formData, address: e })}
+          onChangeText={(e) => setFormData({...formData, address: e})}
         />
       </View>
       <Button
@@ -363,8 +391,7 @@ const ProfileInfo = (props) => {
           style.openSansRegular,
           style.noBorder,
         ]}
-        onPress={() => onSubmit()}
-      >
+        onPress={() => onSubmit()}>
         Submit
       </Button>
     </Card>

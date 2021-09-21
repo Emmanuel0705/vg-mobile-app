@@ -17,7 +17,6 @@ export const loginUser = (payload) => async (dispatch) => {
       throw new Error(
         login.data?.message || 'something went wrong, please try agian',
       );
-    console.log(user);
     dispatch({
       type: STORE_USER_DATA,
       payload: user,
@@ -65,6 +64,7 @@ export const uploadProfile = (token, payload) => async (dispatch) => {
     return {success: false, message: error.message || 'something went wrong'};
   }
 };
+
 export const clearUserData = () => async (dispatch) => {
   dispatch({
     type: CLEAR_USER_DATA,
